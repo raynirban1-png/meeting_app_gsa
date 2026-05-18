@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Admin",
+    "phoneNumber": "8638084494",
+    "password": "gsa2012",
+    "accessRole": "Admin"
+  },
+  {
+    "name": "persistent test",
+    "phoneNumber": "6666666666",
+    "password": "persist123",
+    "accessRole": "Member"
+  },
+  {
+    "name": "server test",
+    "phoneNumber": "1234",
+    "password": "1234",
+    "accessRole": "Member"
+  }
+]

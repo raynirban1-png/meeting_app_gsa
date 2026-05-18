@@ -1,0 +1,12 @@
+[
+  {
+    "title": "server test",
+    "description": "test",
+    "meetingTitle": "servertest",
+    "forVotes": 0,
+    "againstVotes": 0,
+    "abstainVotes": 0,
+    "votedMembers": [],
+    "status": "Draft"
+  }
+]
