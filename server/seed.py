@@ -1,5 +1,11 @@
 from database import SessionLocal, engine
 from models import Base, Member
+import bcrypt
+
+def hash_password(password: str) -> str:
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
 
 def seed_data():
     # Create tables if they don't exist
@@ -15,7 +21,7 @@ def seed_data():
         new_admin = Member(
             name="Dr. Nirban Ray",
             phoneNumber="9999999999",
-            password="admin123",
+            password=hash_password("admin123"),
             accessRole="Admin"
         )
         db.add(new_admin)

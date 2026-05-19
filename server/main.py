@@ -8,14 +8,17 @@ from models import Notice
 from models import Meeting
 from models import Resolution
 import json
-from passlib.context import CryptContext
+import bcrypt
 
 app = FastAPI()
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-)
+def hash_password(password: str) -> str:
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 Base.metadata.create_all(
     bind=engine
@@ -29,9 +32,7 @@ admin_exists = db.query(Member).filter(
 
 if not admin_exists:
 
-    hashed_password = pwd_context.hash(
-        "admin123"
-    )
+    hashed_password = hash_password("admin123")
 
     admin = Member(
         name="Admin",
@@ -93,9 +94,7 @@ def add_member(data: dict):
 
         phoneNumber=data.get("phoneNumber"),
 
-        password=pwd_context.hash(
-            data.get("password")
-        ),
+        password=hash_password(data.get("password")),
 
         accessRole=data.get("accessRole"),
     )
@@ -305,10 +304,7 @@ def login(data: dict):
 
     ).first()
 
-    if member and pwd_context.verify(
-        data.get("password"),
-        member.password,
-    ):
+    if member and verify_password(data.get("password"), member.password):
 
         result = {
 

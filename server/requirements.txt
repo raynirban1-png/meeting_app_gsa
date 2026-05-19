@@ -3,4 +3,4 @@ uvicorn
 sqlalchemy
 databases
 aiosqlite
-passlib[bcrypt]
+bcrypt
