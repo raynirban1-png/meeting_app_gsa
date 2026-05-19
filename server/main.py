@@ -8,8 +8,14 @@ from models import Notice
 from models import Meeting
 from models import Resolution
 import json
+from passlib.context import CryptContext
 
 app = FastAPI()
+
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+)
 
 Base.metadata.create_all(
     bind=engine
@@ -85,7 +91,9 @@ def add_member(data: dict):
 
         phoneNumber=data.get("phoneNumber"),
 
-        password=data.get("password"),
+        password=pwd_context.hash(
+            data.get("password")
+        ),
 
         accessRole=data.get("accessRole"),
     )
@@ -295,7 +303,10 @@ def login(data: dict):
 
     ).first()
 
-    if member and member.password == data.get("password"):
+    if member and pwd_context.verify(
+        data.get("password"),
+        member.password,
+    ):
 
         result = {
 
