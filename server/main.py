@@ -15,6 +15,27 @@ Base.metadata.create_all(
     bind=engine
 )
 
+db = SessionLocal()
+
+admin_exists = db.query(Member).filter(
+    Member.phoneNumber == "9999999999"
+).first()
+
+if not admin_exists:
+
+    admin = Member(
+        name="Admin",
+        phoneNumber="9999999999",
+        password="admin123",
+        accessRole="Admin",
+    )
+
+    db.add(admin)
+
+    db.commit()
+
+db.close()
+
 
 @app.get("/")
 def home():
