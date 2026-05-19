@@ -29,18 +29,20 @@ admin_exists = db.query(Member).filter(
 
 if not admin_exists:
 
+    hashed_password = pwd_context.hash(
+        "admin123"
+    )
+
     admin = Member(
         name="Admin",
         phoneNumber="9999999999",
-        password=pwd_context.hash("admin123"),
+        password=hashed_password,
         accessRole="Admin",
     )
 
     db.add(admin)
 
     db.commit()
-
-db.close()
 
 
 @app.get("/")
