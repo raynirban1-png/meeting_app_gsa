@@ -4,6 +4,7 @@ import '../models/member_store.dart';
 import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../api_config.dart';
 
 class MembersScreen extends StatefulWidget {
   const MembersScreen({
@@ -60,7 +61,7 @@ class _MembersScreenState extends State<MembersScreen> {
       await http.post(
 
         Uri.parse(
-          "http://10.0.2.2:8000/members",
+          "${ApiConfig.baseUrl}/members",
         ),
 
         headers: {
@@ -121,7 +122,7 @@ class _MembersScreenState extends State<MembersScreen> {
       await http.get(
 
         Uri.parse(
-          "http://10.0.2.2:8000/members",
+          "${ApiConfig.baseUrl}/members",
         ),
       );
 

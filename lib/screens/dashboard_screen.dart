@@ -18,6 +18,7 @@ import '../models/meeting_model.dart';
 import '../models/notice_model.dart';
 import '../models/resolution_model.dart';
 import 'package:http/http.dart' as http;
+import '../api_config.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({
@@ -50,7 +51,7 @@ class _DashboardScreenState
   Future<void> loadResolutions() async {
     try {
       final response = await http.get(
-        Uri.parse("http://10.0.2.2:8000/resolutions"),
+        Uri.parse("${ApiConfig.baseUrl}/resolutions"),
       );
       final List data = jsonDecode(response.body);
       ResolutionStore.resolutions = data.map((resolution) {
@@ -74,7 +75,7 @@ class _DashboardScreenState
   Future<void> loadMeetings() async {
     try {
       final response = await http.get(
-        Uri.parse("http://10.0.2.2:8000/meetings"),
+        Uri.parse("${ApiConfig.baseUrl}/meetings"),
       );
       final List data = jsonDecode(response.body);
       MeetingStore.meetings = data.map((meeting) {
@@ -95,7 +96,7 @@ class _DashboardScreenState
   Future<void> loadNotices() async {
     try {
       final response = await http.get(
-        Uri.parse("http://10.0.2.2:8000/notices"),
+        Uri.parse("${ApiConfig.baseUrl}/notices"),
       );
       final List data = jsonDecode(response.body);
       NoticeStore.notices = data.map((notice) {
@@ -119,7 +120,7 @@ class _DashboardScreenState
       await http.get(
 
         Uri.parse(
-          "http://10.0.2.2:8000/members",
+          "${ApiConfig.baseUrl}/members",
         ),
       );
 

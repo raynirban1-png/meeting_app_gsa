@@ -5,6 +5,7 @@ import '../models/meeting_store.dart';
 import 'dart:convert';
 import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
+import '../api_config.dart';
 
 
 class MeetingsScreen extends StatefulWidget {
@@ -46,7 +47,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
 
     try {
       await http.post(
-        Uri.parse("http://10.0.2.2:8000/meetings"),
+        Uri.parse("${ApiConfig.baseUrl}/meetings"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "title": meetingController.text.trim(),
@@ -280,7 +281,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   Future<void> loadMeetings() async {
     try {
       final response = await http.get(
-        Uri.parse("http://10.0.2.2:8000/meetings"),
+        Uri.parse("${ApiConfig.baseUrl}/meetings"),
       );
       final List data = jsonDecode(response.body);
       MeetingStore.meetings = data.map((meeting) {

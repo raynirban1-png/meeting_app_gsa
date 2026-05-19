@@ -4,6 +4,7 @@ import '../models/notice_store.dart';
 import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../api_config.dart';
 
 class NoticesScreen extends StatefulWidget {
   const NoticesScreen({
@@ -37,7 +38,7 @@ class _NoticesScreenState
   Future<void> loadNotices() async {
     try {
       final response = await http.get(
-        Uri.parse("http://10.0.2.2:8000/notices"),
+        Uri.parse("${ApiConfig.baseUrl}/notices"),
       );
       final List data = jsonDecode(response.body);
       NoticeStore.notices = data.map((notice) {
@@ -60,7 +61,7 @@ class _NoticesScreenState
 
     try {
       await http.post(
-        Uri.parse("http://10.0.2.2:8000/notices"),
+        Uri.parse("${ApiConfig.baseUrl}/notices"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "title": titleController.text.trim(),

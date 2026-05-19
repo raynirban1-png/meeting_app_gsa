@@ -1,103 +1,19 @@
 from fastapi import FastAPI
+from database import engine
+from database import SessionLocal
+
+from models import Base
+from models import Member
+from models import Notice
+from models import Meeting
+from models import Resolution
 import json
 
 app = FastAPI()
 
-
-def load_members():
-
-    with open(
-        "members.json",
-        "r"
-    ) as file:
-
-        return json.load(file)
-
-
-def save_members(members):
-
-    with open(
-        "members.json",
-        "w"
-    ) as file:
-
-        json.dump(
-            members,
-            file,
-            indent=2
-        )
-
-
-def load_notices():
-
-    with open(
-        "notices.json",
-        "r"
-    ) as file:
-
-        return json.load(file)
-
-
-def save_notices(notices):
-
-    with open(
-        "notices.json",
-        "w"
-    ) as file:
-
-        json.dump(
-            notices,
-            file,
-            indent=2
-        )
-
-
-def load_meetings():
-
-    with open(
-        "meetings.json",
-        "r"
-    ) as file:
-
-        return json.load(file)
-
-
-def save_meetings(meetings):
-
-    with open(
-        "meetings.json",
-        "w"
-    ) as file:
-
-        json.dump(
-            meetings,
-            file,
-            indent=2
-        )
-
-
-def load_resolutions():
-
-    with open(
-        "resolutions.json",
-        "r"
-    ) as file:
-
-        return json.load(file)
-
-
-def save_resolutions(resolutions):
-
-    with open(
-        "resolutions.json",
-        "w"
-    ) as file:
-
-        json.dump(
-            resolutions,
-            file,
-            indent=2
-        )
+Base.metadata.create_all(
+    bind=engine
+)
 
 
 @app.get("/")
@@ -112,59 +28,105 @@ def home():
 @app.get("/members")
 def get_members():
 
-    return load_members()
+    db = SessionLocal()
+
+    members = db.query(Member).all()
+
+    result = []
+
+    for member in members:
+
+        result.append({
+
+            "name": member.name,
+
+            "phoneNumber": member.phoneNumber,
+
+            "password": member.password,
+
+            "accessRole": member.accessRole,
+
+        })
+
+    db.close()
+
+    return result
 
 
 @app.post("/members")
 def add_member(data: dict):
 
-    members = load_members()
+    db = SessionLocal()
 
-    members.append({
+    member = Member(
 
-        "name":
-        data.get("name"),
+        name=data.get("name"),
 
-        "phoneNumber":
-        data.get("phoneNumber"),
+        phoneNumber=data.get("phoneNumber"),
 
-        "password":
-        data.get("password"),
+        password=data.get("password"),
 
-        "accessRole":
-        data.get("accessRole"),
-    })
+        accessRole=data.get("accessRole"),
+    )
 
-    save_members(members)
+    db.add(member)
+
+    db.commit()
+
+    db.refresh(member)
+
+    db.close()
 
     return {
         "success": True
     }
 
+
 @app.get("/notices")
 def get_notices():
 
-    return load_notices()
+    db = SessionLocal()
+
+    notices = db.query(Notice).all()
+
+    result = []
+
+    for notice in notices:
+
+        result.append({
+
+            "title": notice.title,
+
+            "message": notice.message,
+
+            "priority": notice.priority,
+
+        })
+
+    db.close()
+
+    return result
 
 
 @app.post("/notices")
 def add_notice(data: dict):
 
-    notices = load_notices()
+    db = SessionLocal()
 
-    notices.append({
+    notice = Notice(
 
-        "title":
-        data.get("title"),
+        title=data.get("title"),
 
-        "message":
-        data.get("message"),
+        message=data.get("message"),
 
-        "priority":
-        data.get("priority"),
-    })
+        priority=data.get("priority"),
+    )
 
-    save_notices(notices)
+    db.add(notice)
+
+    db.commit()
+
+    db.close()
 
     return {
         "success": True
@@ -174,33 +136,56 @@ def add_notice(data: dict):
 @app.get("/meetings")
 def get_meetings():
 
-    return load_meetings()
+    db = SessionLocal()
+
+    meetings = db.query(Meeting).all()
+
+    result = []
+
+    for meeting in meetings:
+
+        result.append({
+
+            "title": meeting.title,
+
+            "date": meeting.date,
+
+            "venue": meeting.venue,
+
+            "type": meeting.type,
+
+            "status": meeting.status,
+
+        })
+
+    db.close()
+
+    return result
 
 
 @app.post("/meetings")
 def add_meeting(data: dict):
 
-    meetings = load_meetings()
+    db = SessionLocal()
 
-    meetings.append({
+    meeting = Meeting(
 
-        "title":
-        data.get("title"),
+        title=data.get("title"),
 
-        "date":
-        data.get("date"),
+        date=data.get("date"),
 
-        "venue":
-        data.get("venue"),
+        venue=data.get("venue"),
 
-        "type":
-        data.get("type"),
+        type=data.get("type"),
 
-        "status":
-        data.get("status"),
-    })
+        status=data.get("status"),
+    )
 
-    save_meetings(meetings)
+    db.add(meeting)
+
+    db.commit()
+
+    db.close()
 
     return {
         "success": True
@@ -210,42 +195,68 @@ def add_meeting(data: dict):
 @app.get("/resolutions")
 def get_resolutions():
 
-    return load_resolutions()
+    db = SessionLocal()
+
+    resolutions = db.query(Resolution).all()
+
+    result = []
+
+    for resolution in resolutions:
+
+        result.append({
+
+            "title": resolution.title,
+
+            "description": resolution.description,
+
+            "meetingTitle": resolution.meetingTitle,
+
+            "forVotes": resolution.forVotes,
+
+            "againstVotes": resolution.againstVotes,
+
+            "abstainVotes": resolution.abstainVotes,
+
+            "votedMembers": json.loads(resolution.votedMembers) if resolution.votedMembers else [],
+
+            "status": resolution.status,
+
+        })
+
+    db.close()
+
+    return result
 
 
 @app.post("/resolutions")
 def add_resolution(data: dict):
 
-    resolutions = load_resolutions()
+    db = SessionLocal()
 
-    resolutions.append({
+    resolution = Resolution(
 
-        "title":
-        data.get("title"),
+        title=data.get("title"),
 
-        "description":
-        data.get("description"),
+        description=data.get("description"),
 
-        "meetingTitle":
-        data.get("meetingTitle"),
+        meetingTitle=data.get("meetingTitle"),
 
-        "forVotes":
-        data.get("forVotes", 0),
+        forVotes=data.get("forVotes", 0),
 
-        "againstVotes":
-        data.get("againstVotes", 0),
+        againstVotes=data.get("againstVotes", 0),
 
-        "abstainVotes":
-        data.get("abstainVotes", 0),
+        abstainVotes=data.get("abstainVotes", 0),
 
-        "votedMembers":
-        data.get("votedMembers", []),
+        votedMembers=json.dumps(data.get("votedMembers", [])),
 
-        "status":
-        data.get("status",),
-    })
+        status=data.get("status", "Draft"),
+    )
 
-    save_resolutions(resolutions)
+    db.add(resolution)
+
+    db.commit()
+
+    db.close()
 
     return {
         "success": True
@@ -255,35 +266,35 @@ def add_resolution(data: dict):
 @app.post("/login")
 def login(data: dict):
 
-    members = load_members()
+    db = SessionLocal()
 
-    phoneNumber = data.get(
-        "phoneNumber"
-    )
+    member = db.query(Member).filter(
 
-    password = data.get(
-        "password"
-    )
+        Member.phoneNumber == data.get("phoneNumber")
 
-    for member in members:
+    ).first()
 
-        if (
+    if member and member.password == data.get("password"):
 
-            member["phoneNumber"]
-            == phoneNumber
+        result = {
 
-            and
+            "success": True,
 
-            member["password"]
-            == password
-        ):
+            "member": {
 
-            return {
+                "name": member.name,
 
-                "success": True,
+                "phoneNumber": member.phoneNumber,
 
-                "member": member
+                "accessRole": member.accessRole,
             }
+        }
+
+        db.close()
+
+        return result
+
+    db.close()
 
     return {
         "success": False

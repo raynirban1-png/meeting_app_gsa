@@ -5,6 +5,7 @@ import 'dart:convert';
 import '../models/meeting_store.dart';
 import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
+import '../api_config.dart';
 
 class ResolutionsScreen extends StatefulWidget {
   const ResolutionsScreen({
@@ -40,7 +41,7 @@ class _ResolutionsScreenState
 
     try {
       await http.post(
-        Uri.parse("http://10.0.2.2:8000/resolutions"),
+        Uri.parse("${ApiConfig.baseUrl}/resolutions"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "title": titleController.text.trim(),
@@ -107,7 +108,7 @@ class _ResolutionsScreenState
   Future<void> loadResolutions() async {
     try {
       final response = await http.get(
-        Uri.parse("http://10.0.2.2:8000/resolutions"),
+        Uri.parse("${ApiConfig.baseUrl}/resolutions"),
       );
       final List data = jsonDecode(response.body);
       ResolutionStore.resolutions = data.map((resolution) {

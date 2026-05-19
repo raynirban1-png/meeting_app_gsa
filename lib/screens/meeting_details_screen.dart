@@ -23,16 +23,19 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
   final TextEditingController resolutionDescriptionController =
       TextEditingController();
 
-  List<AttendanceModel> get attendanceList {
+  List<AttendanceModel> attendanceList = [];
 
-    return MemberStore.members.map((member) {
-
+  @override
+  void initState() {
+    super.initState();
+    attendanceList = MemberStore.members.map((member) {
       return AttendanceModel(
         memberName: member.name,
+        isPresent: false,
       );
-
     }).toList();
   }
+
   int get presentCount {
 
     return attendanceList

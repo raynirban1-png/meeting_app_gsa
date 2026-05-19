@@ -6,6 +6,7 @@ import '../models/member_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../api_config.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -64,78 +65,59 @@ class _LoginScreenState
   }
 
   Future<void> login() async {
-
-    final response = await http.post(
-
-      Uri.parse(
-        "http://10.0.2.2:8000/login",
-      ),
-
-      headers: {
-        "Content-Type":
-        "application/json",
-      },
-
-      body: jsonEncode({
-
-        "phoneNumber":
-        phoneController.text.trim(),
-
-        "password":
-        passwordController.text.trim(),
-      }),
-    );
-
-    final data = jsonDecode(
-      response.body,
-    );
-
-    if (data["success"] == true) {
-
-      final memberData =
-      data["member"];
-
-      final member = MemberModel(
-
-        name:
-        memberData["name"],
-
-        role: "",
-
-        department: "",
-
-        accessRole:
-        memberData["accessRole"],
-
-        phoneNumber:
-        memberData["phoneNumber"],
-
-        password:
-        memberData["password"],
-      );
-
-      CurrentUserStore.currentUser =
-          member;
-
-      Navigator.pushReplacement(
-
-        context,
-
-        MaterialPageRoute(
-
-          builder: (context) =>
-          const DashboardScreen(),
+    try {
+      final response = await http.post(
+        Uri.parse(
+          "${ApiConfig.baseUrl}/login",
         ),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "phoneNumber": phoneController.text.trim(),
+          "password": passwordController.text.trim(),
+        }),
       );
 
-    } else {
+      final data = jsonDecode(
+        response.body,
+      );
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      if (data["success"] == true) {
+        final memberData = data["member"];
 
-        const SnackBar(
+        final member = MemberModel(
+          name: memberData["name"],
+          role: "",
+          department: "",
+          accessRole: memberData["accessRole"],
+          phoneNumber: memberData["phoneNumber"],
+          password: memberData["password"],
+        );
+
+        CurrentUserStore.currentUser = member;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DashboardScreen(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Invalid Login",
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Login error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
           content: Text(
-            "Invalid Login",
+            "Connection Error: ${e.toString()}",
           ),
         ),
       );
