@@ -32,7 +32,7 @@ if not admin_exists:
     admin = Member(
         name="Admin",
         phoneNumber="9999999999",
-        password="admin123",
+        password=pwd_context.hash("admin123"),
         accessRole="Admin",
     )
 
