@@ -305,7 +305,13 @@ def login(data: dict):
 
                 "name": member.name,
 
+                "role": "",
+
+                "department": "",
+
                 "phoneNumber": member.phoneNumber,
+
+                "password": member.password,
 
                 "accessRole": member.accessRole,
             }

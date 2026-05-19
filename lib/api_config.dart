@@ -1,6 +1,6 @@
 class ApiConfig {
 
-  static const bool isProduction = false;
+  static const bool isProduction = true;
 
   static String get baseUrl {
 
