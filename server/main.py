@@ -90,6 +90,16 @@ def get_members():
 def add_member(data: dict):
     db = SessionLocal()
     try:
+        existing_member = db.query(Member).filter(
+            Member.phoneNumber == data.get("phoneNumber")
+        ).first()
+
+        if existing_member:
+
+                return {
+                    "success": False,
+                    "message": "Phone number already exists"
+                    }
         member = Member(
             name=data.get("name"),
             phoneNumber=data.get("phoneNumber"),

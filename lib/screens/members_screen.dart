@@ -58,7 +58,7 @@ class _MembersScreenState extends State<MembersScreen> {
 
     try {
 
-      await http.post(
+      final response = await http.post(
 
         Uri.parse(
           "${ApiConfig.baseUrl}/members",
@@ -85,15 +85,18 @@ class _MembersScreenState extends State<MembersScreen> {
         }),
       );
 
+      final data = jsonDecode(response.body);
+
       ScaffoldMessenger.of(context)
           .showSnackBar(
 
-        const SnackBar(
+         SnackBar(
           content: Text(
-            "Member Added",
+            data["message"] ?? "Member Added",
           ),
-        ),
-      );
+          ),
+        );
+
 
       Navigator.pop(context);
       await loadMembers();
