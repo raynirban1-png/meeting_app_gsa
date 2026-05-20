@@ -138,7 +138,7 @@ class _NoticesScreenState
 
               DropdownButtonFormField<String>(
 
-                value: selectedPriority,
+                initialValue: selectedPriority,
 
                 decoration:
                 const InputDecoration(
@@ -471,7 +471,7 @@ class _NoticesScreenState
 
                     DropdownButtonFormField<String>(
 
-                      value: selectedPriority,
+                      initialValue: selectedPriority,
 
                       decoration:
                       const InputDecoration(

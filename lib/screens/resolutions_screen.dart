@@ -295,7 +295,7 @@ class _ResolutionsScreenState
       DropdownButtonFormField<
           String>(
 
-        value:
+        initialValue:
         selectedStatusFilter,
 
         decoration:
@@ -678,7 +678,7 @@ class _ResolutionsScreenState
 
                     DropdownButtonFormField<String>(
 
-                      value: selectedMeeting,
+                      initialValue: selectedMeeting,
 
                       decoration: const InputDecoration(
                         labelText: "Select Meeting",

@@ -224,7 +224,7 @@ class _MembersScreenState extends State<MembersScreen> {
                 ),
                 const SizedBox(height: 15),
                 DropdownButtonFormField<String>(
-                  value: selectedAccessRole,
+                  initialValue: selectedAccessRole,
                   decoration: const InputDecoration(
                     labelText: "Access Role",
                   ),
@@ -509,7 +509,7 @@ class _MembersScreenState extends State<MembersScreen> {
                             ),
                             const SizedBox(height: 15),
                             DropdownButtonFormField<String>(
-                              value: selectedAccessRole,
+                              initialValue: selectedAccessRole,
                               decoration: const InputDecoration(
                                 labelText: "Access Role",
                               ),

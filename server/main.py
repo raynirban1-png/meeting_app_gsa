@@ -9,8 +9,17 @@ from models import Meeting
 from models import Resolution
 import json
 import bcrypt
+from jose import jwt
+from datetime import datetime
+from datetime import timedelta
 
 app = FastAPI()
+
+SECRET_KEY = "gsa_secret_key"
+
+ALGORITHM = "HS256"
+
+ACCESS_TOKEN_EXPIRE_HOURS = 24
 
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
@@ -20,318 +29,214 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
 
-Base.metadata.create_all(
-    bind=engine
-)
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
-db = SessionLocal()
+# Create tables
+Base.metadata.create_all(bind=engine)
 
-admin_exists = db.query(Member).filter(
-    Member.phoneNumber == "9999999999"
-).first()
+def seed_admin():
+    db = SessionLocal()
+    try:
+        admin_exists = db.query(Member).filter(
+            Member.phoneNumber == "9999999999"
+        ).first()
 
-if not admin_exists:
+        if not admin_exists:
+            hashed_admin_password = hash_password("admin123")
+            admin = Member(
+                name="Admin",
+                phoneNumber="9999999999",
+                password=hashed_admin_password,
+                accessRole="Admin",
+            )
+            db.add(admin)
+            db.commit()
+    finally:
+        db.close()
 
-    hashed_password = hash_password("admin123")
-
-    admin = Member(
-        name="Admin",
-        phoneNumber="9999999999",
-        password=hashed_password,
-        accessRole="Admin",
-    )
-
-    db.add(admin)
-
-    db.commit()
-
+seed_admin()
 
 @app.get("/")
 def home():
-
     return {
-        "message":
-        "GSA Governance Server Running"
+        "message": "GSA Governance Server Running"
     }
 
 
 @app.get("/members")
 def get_members():
-
     db = SessionLocal()
-
-    members = db.query(Member).all()
-
-    result = []
-
-    for member in members:
-
-        result.append({
-
-            "name": member.name,
-
-            "phoneNumber": member.phoneNumber,
-
-            "password": member.password,
-
-            "accessRole": member.accessRole,
-
-        })
-
-    db.close()
-
-    return result
+    try:
+        members = db.query(Member).all()
+        result = []
+        for member in members:
+            result.append({
+                "name": member.name,
+                "phoneNumber": member.phoneNumber,
+                "password": member.password,
+                "accessRole": member.accessRole,
+            })
+        return result
+    finally:
+        db.close()
 
 
 @app.post("/members")
 def add_member(data: dict):
-
     db = SessionLocal()
-
-    member = Member(
-
-        name=data.get("name"),
-
-        phoneNumber=data.get("phoneNumber"),
-
-        password=hash_password(data.get("password")),
-
-        accessRole=data.get("accessRole"),
-    )
-
-    db.add(member)
-
-    db.commit()
-
-    db.refresh(member)
-
-    db.close()
-
-    return {
-        "success": True
-    }
+    try:
+        member = Member(
+            name=data.get("name"),
+            phoneNumber=data.get("phoneNumber"),
+            password=hash_password(data.get("password")),
+            accessRole=data.get("accessRole"),
+        )
+        db.add(member)
+        db.commit()
+        return {"success": True}
+    finally:
+        db.close()
 
 
 @app.get("/notices")
 def get_notices():
-
     db = SessionLocal()
-
-    notices = db.query(Notice).all()
-
-    result = []
-
-    for notice in notices:
-
-        result.append({
-
-            "title": notice.title,
-
-            "message": notice.message,
-
-            "priority": notice.priority,
-
-        })
-
-    db.close()
-
-    return result
+    try:
+        notices = db.query(Notice).all()
+        result = []
+        for notice in notices:
+            result.append({
+                "title": notice.title,
+                "message": notice.message,
+                "priority": notice.priority,
+            })
+        return result
+    finally:
+        db.close()
 
 
 @app.post("/notices")
 def add_notice(data: dict):
-
     db = SessionLocal()
-
-    notice = Notice(
-
-        title=data.get("title"),
-
-        message=data.get("message"),
-
-        priority=data.get("priority"),
-    )
-
-    db.add(notice)
-
-    db.commit()
-
-    db.close()
-
-    return {
-        "success": True
-    }
+    try:
+        notice = Notice(
+            title=data.get("title"),
+            message=data.get("message"),
+            priority=data.get("priority"),
+        )
+        db.add(notice)
+        db.commit()
+        return {"success": True}
+    finally:
+        db.close()
 
 
 @app.get("/meetings")
 def get_meetings():
-
     db = SessionLocal()
-
-    meetings = db.query(Meeting).all()
-
-    result = []
-
-    for meeting in meetings:
-
-        result.append({
-
-            "title": meeting.title,
-
-            "date": meeting.date,
-
-            "venue": meeting.venue,
-
-            "type": meeting.type,
-
-            "status": meeting.status,
-
-        })
-
-    db.close()
-
-    return result
+    try:
+        meetings = db.query(Meeting).all()
+        result = []
+        for meeting in meetings:
+            result.append({
+                "title": meeting.title,
+                "date": meeting.date,
+                "venue": meeting.venue,
+                "type": meeting.type,
+                "status": meeting.status,
+            })
+        return result
+    finally:
+        db.close()
 
 
 @app.post("/meetings")
 def add_meeting(data: dict):
-
     db = SessionLocal()
-
-    meeting = Meeting(
-
-        title=data.get("title"),
-
-        date=data.get("date"),
-
-        venue=data.get("venue"),
-
-        type=data.get("type"),
-
-        status=data.get("status"),
-    )
-
-    db.add(meeting)
-
-    db.commit()
-
-    db.close()
-
-    return {
-        "success": True
-    }
+    try:
+        meeting = Meeting(
+            title=data.get("title"),
+            date=data.get("date"),
+            venue=data.get("venue"),
+            type=data.get("type"),
+            status=data.get("status"),
+        )
+        db.add(meeting)
+        db.commit()
+        return {"success": True}
+    finally:
+        db.close()
 
 
 @app.get("/resolutions")
 def get_resolutions():
-
     db = SessionLocal()
-
-    resolutions = db.query(Resolution).all()
-
-    result = []
-
-    for resolution in resolutions:
-
-        result.append({
-
-            "title": resolution.title,
-
-            "description": resolution.description,
-
-            "meetingTitle": resolution.meetingTitle,
-
-            "forVotes": resolution.forVotes,
-
-            "againstVotes": resolution.againstVotes,
-
-            "abstainVotes": resolution.abstainVotes,
-
-            "votedMembers": json.loads(resolution.votedMembers) if resolution.votedMembers else [],
-
-            "status": resolution.status,
-
-        })
-
-    db.close()
-
-    return result
+    try:
+        resolutions = db.query(Resolution).all()
+        result = []
+        for resolution in resolutions:
+            result.append({
+                "title": resolution.title,
+                "description": resolution.description,
+                "meetingTitle": resolution.meetingTitle,
+                "forVotes": resolution.forVotes,
+                "againstVotes": resolution.againstVotes,
+                "abstainVotes": resolution.abstainVotes,
+                "votedMembers": json.loads(resolution.votedMembers) if resolution.votedMembers else [],
+                "status": resolution.status,
+            })
+        return result
+    finally:
+        db.close()
 
 
 @app.post("/resolutions")
 def add_resolution(data: dict):
-
     db = SessionLocal()
-
-    resolution = Resolution(
-
-        title=data.get("title"),
-
-        description=data.get("description"),
-
-        meetingTitle=data.get("meetingTitle"),
-
-        forVotes=data.get("forVotes", 0),
-
-        againstVotes=data.get("againstVotes", 0),
-
-        abstainVotes=data.get("abstainVotes", 0),
-
-        votedMembers=json.dumps(data.get("votedMembers", [])),
-
-        status=data.get("status", "Draft"),
-    )
-
-    db.add(resolution)
-
-    db.commit()
-
-    db.close()
-
-    return {
-        "success": True
-    }
+    try:
+        resolution = Resolution(
+            title=data.get("title"),
+            description=data.get("description"),
+            meetingTitle=data.get("meetingTitle"),
+            forVotes=data.get("forVotes", 0),
+            againstVotes=data.get("againstVotes", 0),
+            abstainVotes=data.get("abstainVotes", 0),
+            votedMembers=json.dumps(data.get("votedMembers", [])),
+            status=data.get("status", "Draft"),
+        )
+        db.add(resolution)
+        db.commit()
+        return {"success": True}
+    finally:
+        db.close()
 
 
 @app.post("/login")
 def login(data: dict):
-
     db = SessionLocal()
+    try:
+        member = db.query(Member).filter(
+            Member.phoneNumber == data.get("phoneNumber")
+        ).first()
 
-    member = db.query(Member).filter(
-
-        Member.phoneNumber == data.get("phoneNumber")
-
-    ).first()
-
-    if member and verify_password(data.get("password"), member.password):
-
-        result = {
-
-            "success": True,
-
-            "member": {
-
-                "name": member.name,
-
-                "role": "",
-
-                "department": "",
-
-                "phoneNumber": member.phoneNumber,
-
-                "password": member.password,
-
-                "accessRole": member.accessRole,
+        if member and verify_password(data.get("password"), member.password):
+            token = create_access_token({
+                "phoneNumber": member.phoneNumber
+            })
+            return {
+                "success": True,
+                "token": token,
+                "member": {
+                    "name": member.name,
+                    "phoneNumber": member.phoneNumber,
+                    "accessRole": member.accessRole,
+                }
             }
-        }
-
+        return {"success": False}
+    finally:
         db.close()
-
-        return result
-
-    db.close()
-
-    return {
-        "success": False
-    }
