@@ -84,6 +84,12 @@ class _LoginScreenState
       );
 
       if (data["success"] == true) {
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setString(
+          "token",
+          data["token"],
+        );
         final memberData = data["member"];
 
         final member = MemberModel(
