@@ -89,6 +89,16 @@ def get_members():
 @app.post("/members")
 def add_member(data: dict):
     db = SessionLocal()
+    current_user = db.query(Member).filter(
+        Member.phoneNumber == data.get("currentUserPhone")
+    ).first()
+
+    if not current_user or current_user.accessRole != "Admin":
+
+        return {
+        "success": False,
+        "message": "Admin access required"
+    }
     try:
         existing_member = db.query(Member).filter(
             Member.phoneNumber == data.get("phoneNumber")

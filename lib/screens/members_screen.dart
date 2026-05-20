@@ -82,6 +82,11 @@ class _MembersScreenState extends State<MembersScreen> {
 
           "accessRole":
           selectedAccessRole,
+
+          "currentUserPhone":
+          CurrentUserStore
+              .currentUser
+              ?.phoneNumber,
         }),
       );
 
