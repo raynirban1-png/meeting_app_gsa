@@ -102,6 +102,7 @@ class _LoginScreenState
         );
 
         CurrentUserStore.currentUser = member;
+        print(CurrentUserStore.currentUser?.phoneNumber);
 
         Navigator.pushReplacement(
           context,
