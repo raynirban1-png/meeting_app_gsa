@@ -462,7 +462,7 @@ class _MembersScreenState extends State<MembersScreen> {
                 ),
               ],
             ),
-      floatingActionButton: canManageMembers()
+      floatingActionButton: CurrentUserStore.isAdmin
           ? FloatingActionButton(
               onPressed: () {
                 showDialog(
