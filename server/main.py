@@ -246,7 +246,12 @@ def login(data: dict):
 
         if member and verify_password(data.get("password"), member.password):
             token = create_access_token({
-                "phoneNumber": member.phoneNumber
+
+                "phoneNumber":
+                    member.phoneNumber,
+
+                "accessRole":
+                    member.accessRole,
             })
             return {
                 "success": True,
