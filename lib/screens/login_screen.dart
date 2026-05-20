@@ -29,6 +29,8 @@ class _LoginScreenState
   passwordController =
   TextEditingController();
 
+  bool isLoading = false;
+
   Future<void> loadMembers() async {
 
     final prefs =
@@ -66,6 +68,9 @@ class _LoginScreenState
 
   Future<void> login() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       final response = await http.post(
         Uri.parse(
           "${ApiConfig.baseUrl}/login",
@@ -102,6 +107,9 @@ class _LoginScreenState
         );
 
         CurrentUserStore.currentUser = member;
+        setState(() {
+          isLoading = false;
+        });
         print(CurrentUserStore.currentUser?.phoneNumber);
 
         Navigator.pushReplacement(
@@ -120,6 +128,9 @@ class _LoginScreenState
         );
       }
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       print("Login error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -192,9 +203,15 @@ class _LoginScreenState
 
             ElevatedButton(
 
-              onPressed: login,
+              onPressed: isLoading
+                  ? null
+                  : login,
 
-              child: const Text(
+              child: isLoading
+
+                  ? const CircularProgressIndicator()
+
+                  : const Text(
                 "Login",
               ),
             ),

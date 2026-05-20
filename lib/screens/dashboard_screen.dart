@@ -19,6 +19,7 @@ import '../models/notice_model.dart';
 import '../models/resolution_model.dart';
 import 'package:http/http.dart' as http;
 import '../api_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({
@@ -431,6 +432,11 @@ class _DashboardScreenState
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
+              SharedPreferences.getInstance()
+                  .then((prefs) {
+
+                prefs.remove("token");
+              });
               CurrentUserStore.currentUser = null;
               Navigator.pushReplacement(
                 context,

@@ -5,6 +5,7 @@ import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../api_config.dart';
+import '../lib/api_service.dart';
 
 class MembersScreen extends StatefulWidget {
   const MembersScreen({
@@ -64,10 +65,10 @@ class _MembersScreenState extends State<MembersScreen> {
           "${ApiConfig.baseUrl}/members",
         ),
 
-        headers: {
-          "Content-Type":
-          "application/json",
-        },
+          headers:
+          await ApiService
+              .getHeaders(),
+
 
         body: jsonEncode({
 
@@ -83,8 +84,7 @@ class _MembersScreenState extends State<MembersScreen> {
           "accessRole":
           selectedAccessRole,
 
-          "currentUserPhone":
-            9999999999,
+
         }),
       );
 

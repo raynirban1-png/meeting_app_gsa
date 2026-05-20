@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
 from database import engine
 from database import SessionLocal
 
@@ -36,6 +36,21 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+def get_current_user(token: str):
+
+    try:
+
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        return payload
+
+    except:
+
+        return None
 # Create tables
 Base.metadata.create_all(bind=engine)
 
@@ -87,18 +102,43 @@ def get_members():
 
 
 @app.post("/members")
-def add_member(data: dict):
+def add_member(
+        data: dict,
+        authorization: str = Header(
+            default=None,
+            alias="Authorization"
+        )
+):
     db = SessionLocal()
-    current_user = db.query(Member).filter(
-        Member.phoneNumber == data.get("currentUserPhone")
-    ).first()
+    auth_header = authorization
 
-    if not current_user or current_user.accessRole != "Admin":
+    if not auth_header:
 
         return {
-        "success": False,
-        "message": "Admin access required"
-    }
+            "success": False,
+            "message": "Token missing"
+        }
+
+    token = auth_header.replace(
+        "Bearer ",
+        ""
+    )
+
+    payload = get_current_user(token)
+
+    if not payload:
+
+        return {
+            "success": False,
+            "message": "Invalid token"
+        }
+
+    if payload.get("accessRole") != "Admin":
+
+        return {
+            "success": False,
+            "message": "Admin access required"
+        }
     try:
         existing_member = db.query(Member).filter(
             Member.phoneNumber == data.get("phoneNumber")
