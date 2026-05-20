@@ -232,8 +232,17 @@ def login(data: dict):
                 "success": True,
                 "token": token,
                 "member": {
+
                     "name": member.name,
+
+                    "role": "",
+
+                    "department": "",
+
                     "phoneNumber": member.phoneNumber,
+
+                    "password": "",
+
                     "accessRole": member.accessRole,
                 }
             }
