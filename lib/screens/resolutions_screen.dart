@@ -404,13 +404,17 @@ class _ResolutionsScreenState
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
+                  if (CurrentUserStore.isAdmin)
+
+                    IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
                       editResolution(index);
                     },
                   ),
-                  IconButton(
+                  if (CurrentUserStore.isAdmin)
+
+                    IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
                       deleteResolution(index);

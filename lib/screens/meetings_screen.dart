@@ -512,13 +512,17 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
+                          if (CurrentUserStore.isAdmin)
+
+                            IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
                               editMeeting(index);
                             },
                           ),
-                          IconButton(
+                          if (CurrentUserStore.isAdmin)
+
+                            IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {
                               deleteMeeting(index);

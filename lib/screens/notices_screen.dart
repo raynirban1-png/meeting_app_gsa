@@ -347,7 +347,9 @@ class _NoticesScreenState
 
                 children: [
 
-                  IconButton(
+                  if (CurrentUserStore.isAdmin)
+
+                    IconButton(
 
                     icon: const Icon(Icons.edit),
 
@@ -357,7 +359,9 @@ class _NoticesScreenState
                     },
                   ),
 
-                  IconButton(
+                  if (CurrentUserStore.isAdmin)
+
+                    IconButton(
 
                     icon: const Icon(
                       Icons.delete,
