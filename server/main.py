@@ -317,6 +317,23 @@ def add_meeting(
         )
         db.add(meeting)
         db.commit()
+        log = ActivityLog(
+
+            action="Meeting Created",
+
+            performedBy=
+            payload.get(
+                "phoneNumber"
+            ),
+
+            timestamp=str(
+                datetime.utcnow()
+            )
+        )
+
+        db.add(log)
+
+        db.commit()
         return {"success": True}
     finally:
         db.close()
