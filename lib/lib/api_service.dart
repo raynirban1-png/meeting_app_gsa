@@ -24,6 +24,25 @@ class ApiService {
 
       "Authorization":
       "Bearer $token",
+
     };
   }
+
+  static Future<http.Response>
+    post(
+
+  String url, {
+  Object? body,
+}) async {
+
+  return await http.post(
+
+    Uri.parse(url),
+
+    headers:
+        await getHeaders(),
+
+    body: body,
+  );
+}
 }

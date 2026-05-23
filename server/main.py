@@ -7,6 +7,7 @@ from models import Member
 from models import Notice
 from models import Meeting
 from models import Resolution
+from models import ActivityLog
 import json
 import bcrypt
 from jose import jwt
@@ -158,6 +159,23 @@ def add_member(
         )
         db.add(member)
         db.commit()
+        log = ActivityLog(
+
+            action="Member Added",
+
+            performedBy=
+            payload.get(
+                "phoneNumber"
+            ),
+
+            timestamp=str(
+                datetime.utcnow()
+            )
+        )
+
+        db.add(log)
+
+        db.commit()
         return {"success": True}
     finally:
         db.close()
@@ -181,8 +199,44 @@ def get_notices():
 
 
 @app.post("/notices")
-def add_notice(data: dict):
+def add_notice(
+    data: dict,
+    authorization: str = Header(
+        default=None,
+        alias="Authorization"
+    )
+):
     db = SessionLocal()
+    auth_header = authorization
+
+    if not auth_header:
+
+        return {
+            "success": False,
+            "message": "Token missing"
+        }
+
+    token = auth_header.replace(
+        "Bearer ",
+        ""
+    )
+
+    payload = get_current_user(token)
+
+    if not payload:
+
+        return {
+            "success": False,
+            "message": "Invalid token"
+        }
+
+    if payload.get("accessRole") != "Admin":
+
+        return {
+            "success": False,
+            "message": "Admin access required"
+        }
+
     try:
         notice = Notice(
             title=data.get("title"),
@@ -216,8 +270,43 @@ def get_meetings():
 
 
 @app.post("/meetings")
-def add_meeting(data: dict):
+def add_meeting(
+        data: dict,
+        authorization: str = Header(
+            default=None,
+            alias="Authorization"
+        )
+):
     db = SessionLocal()
+    auth_header = authorization
+
+    if not auth_header:
+
+        return {
+            "success": False,
+            "message": "Token missing"
+        }
+
+    token = auth_header.replace(
+        "Bearer ",
+        ""
+    )
+
+    payload = get_current_user(token)
+
+    if not payload:
+
+        return {
+            "success": False,
+            "message": "Invalid token"
+        }
+
+    if payload.get("accessRole") != "Admin":
+
+        return {
+            "success": False,
+            "message": "Admin access required"
+        }
     try:
         meeting = Meeting(
             title=data.get("title"),
@@ -254,10 +343,88 @@ def get_resolutions():
     finally:
         db.close()
 
+@app.get("/activity-logs")
+def get_activity_logs():
+
+    db = SessionLocal()
+
+    try:
+
+        logs = db.query(
+            ActivityLog
+        ).all()
+
+        return [
+
+            {
+                "action":
+                    log.action,
+
+                "performedBy":
+                    log.performedBy,
+
+                "timestamp":
+                    log.timestamp,
+            }
+
+            for log in logs
+        ]
+
+    finally:
+
+        db.close()
+
+@app.get("/create-tables")
+def create_tables():
+
+    Base.metadata.create_all(
+        bind=engine
+    )
+
+    return {
+        "message":
+            "Tables created"
+    }
+
 
 @app.post("/resolutions")
-def add_resolution(data: dict):
+def add_resolution(
+        data: dict,
+        authorization: str = Header(
+            default=None,
+            alias="Authorization"
+        )
+):
     db = SessionLocal()
+    auth_header = authorization
+
+    if not auth_header:
+
+        return {
+            "success": False,
+            "message": "Token missing"
+        }
+
+    token = auth_header.replace(
+        "Bearer ",
+        ""
+    )
+
+    payload = get_current_user(token)
+
+    if not payload:
+
+        return {
+            "success": False,
+            "message": "Invalid token"
+        }
+
+    if payload.get("accessRole") != "Admin":
+
+        return {
+            "success": False,
+            "message": "Admin access required"
+        }
     try:
         resolution = Resolution(
             title=data.get("title"),

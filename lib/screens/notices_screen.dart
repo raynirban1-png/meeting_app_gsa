@@ -5,6 +5,7 @@ import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../api_config.dart';
+import '../lib/api_service.dart';
 
 class NoticesScreen extends StatefulWidget {
   const NoticesScreen({
@@ -62,7 +63,7 @@ class _NoticesScreenState
     try {
       await http.post(
         Uri.parse("${ApiConfig.baseUrl}/notices"),
-        headers: {"Content-Type": "application/json"},
+        headers: await ApiService.getHeaders(),
         body: jsonEncode({
           "title": titleController.text.trim(),
           "message": messageController.text.trim(),

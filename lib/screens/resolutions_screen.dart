@@ -6,6 +6,7 @@ import '../models/meeting_store.dart';
 import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
 import '../api_config.dart';
+import '../lib/api_service.dart';
 
 class ResolutionsScreen extends StatefulWidget {
   const ResolutionsScreen({
@@ -42,7 +43,7 @@ class _ResolutionsScreenState
     try {
       await http.post(
         Uri.parse("${ApiConfig.baseUrl}/resolutions"),
-        headers: {"Content-Type": "application/json"},
+        headers: await ApiService.getHeaders(),
         body: jsonEncode({
           "title": titleController.text.trim(),
           "description": descriptionController.text.trim(),
@@ -54,6 +55,7 @@ class _ResolutionsScreenState
           "status": "Draft",
         }),
       );
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Resolution Added")),

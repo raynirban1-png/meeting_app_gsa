@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../api_config.dart';
+import '../services/sync_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -107,6 +108,7 @@ class _LoginScreenState
         );
 
         CurrentUserStore.currentUser = member;
+        await SyncService.syncAll();
         setState(() {
           isLoading = false;
         });

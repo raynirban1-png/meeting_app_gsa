@@ -6,6 +6,7 @@ import 'dart:convert';
 import '../models/current_user_store.dart';
 import 'package:http/http.dart' as http;
 import '../api_config.dart';
+import '../lib/api_service.dart';
 
 
 class MeetingsScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
     try {
       await http.post(
         Uri.parse("${ApiConfig.baseUrl}/meetings"),
-        headers: {"Content-Type": "application/json"},
+        headers: await ApiService.getHeaders(),
         body: jsonEncode({
           "title": meetingController.text.trim(),
           "date": dateController.text.trim(),
@@ -57,6 +58,8 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
           "status": statusController.text.trim(),
         }),
       );
+
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Meeting Created")),

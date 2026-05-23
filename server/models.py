@@ -91,3 +91,20 @@ class Resolution(Base):
     votedMembers = Column(Text)
 
     status = Column(String)
+
+
+    class ActivityLog(Base):
+
+    __tablename__ = "activity_logs"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    action = Column(String)
+
+    performedBy = Column(String)
+
+    timestamp = Column(String)

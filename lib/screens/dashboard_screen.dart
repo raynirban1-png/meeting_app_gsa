@@ -20,6 +20,8 @@ import '../models/resolution_model.dart';
 import 'package:http/http.dart' as http;
 import '../api_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/sync_service.dart';
+import 'activity_logs_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({
@@ -430,6 +432,14 @@ class _DashboardScreenState
         title: const Text("GSA"),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              setState(() {});
+              await SyncService.syncAll();
+              setState(() {});
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
               SharedPreferences.getInstance()
@@ -455,6 +465,25 @@ class _DashboardScreenState
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
+              if (SyncService.isSyncing)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "Syncing latest updates...",
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 14),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -540,6 +569,32 @@ class _DashboardScreenState
                         context,
                         MaterialPageRoute(
                           builder: (context) => const MembersScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  if (CurrentUserStore
+                      .isAdmin)
+
+                    dashboardCard(
+
+                    title: "Activity Logs",
+
+                    icon: Icons.history,
+
+                    color: Colors.orange,
+
+                    onTap: () {
+
+                      Navigator.push(
+
+                        context,
+
+                        MaterialPageRoute(
+
+                          builder: (context) =>
+
+                          const ActivityLogsScreen(),
                         ),
                       );
                     },
