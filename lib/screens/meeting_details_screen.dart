@@ -4,6 +4,7 @@ import '../models/attendance_model.dart';
 import '../models/resolution_model.dart';
 import '../models/member_store.dart';
 import '../models/resolution_store.dart';
+import '../models/current_user_store.dart';
 
 class MeetingDetailsScreen extends StatefulWidget {
   final MeetingModel meeting;
@@ -204,11 +205,13 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
                         attendanceList[index].memberName,
                       ),
                       value: attendanceList[index].isPresent,
-                      onChanged: (value) {
-                        setState(() {
-                          attendanceList[index].isPresent = value ?? false;
-                        });
-                      },
+                      onChanged: CurrentUserStore.isAdmin
+                          ? (value) {
+                              setState(() {
+                                attendanceList[index].isPresent = value ?? false;
+                              });
+                            }
+                          : null,
                     ),
                   );
                 },
@@ -229,74 +232,75 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
                     ),
                   ),
 
-                  ElevatedButton(
-                    onPressed: () {
+                  if (CurrentUserStore.isAdmin)
+                    ElevatedButton(
+                      onPressed: () {
 
-                      showDialog(
-                        context: context,
+                        showDialog(
+                          context: context,
 
-                        builder: (context) {
+                          builder: (context) {
 
-                          return AlertDialog(
+                            return AlertDialog(
 
-                            title: const Text(
-                              "Add Resolution",
-                            ),
+                              title: const Text(
+                                "Add Resolution",
+                              ),
 
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
 
-                              children: [
+                                children: [
 
-                                TextField(
-                                  controller:
-                                  resolutionTitleController,
+                                  TextField(
+                                    controller:
+                                    resolutionTitleController,
 
-                                  decoration:
-                                  const InputDecoration(
-                                    hintText:
-                                    "Resolution Title",
+                                    decoration:
+                                    const InputDecoration(
+                                      hintText:
+                                      "Resolution Title",
+                                    ),
                                   ),
+
+                                  const SizedBox(height: 15),
+
+                                  TextField(
+                                    controller:
+                                    resolutionDescriptionController,
+
+                                    decoration:
+                                    const InputDecoration(
+                                      hintText:
+                                      "Resolution Description",
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              actions: [
+
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+
+                                  child: const Text("Cancel"),
                                 ),
 
-                                const SizedBox(height: 15),
+                                ElevatedButton(
+                                  onPressed: addResolution,
 
-                                TextField(
-                                  controller:
-                                  resolutionDescriptionController,
-
-                                  decoration:
-                                  const InputDecoration(
-                                    hintText:
-                                    "Resolution Description",
-                                  ),
+                                  child: const Text("Save"),
                                 ),
                               ],
-                            ),
+                            );
+                          },
+                        );
+                      },
 
-                            actions: [
-
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-
-                                child: const Text("Cancel"),
-                              ),
-
-                              ElevatedButton(
-                                onPressed: addResolution,
-
-                                child: const Text("Save"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-
-                    child: const Text("Add"),
-                  ),
+                      child: const Text("Add"),
+                    ),
                 ],
               ),
               const SizedBox(height: 20),

@@ -180,6 +180,97 @@ def add_member(
     finally:
         db.close()
 
+@app.delete("/members/{phone_number}")
+def delete_member(
+        phone_number: str,
+        authorization: str = Header(
+            default=None,
+            alias="Authorization"
+        )
+):
+
+    db = SessionLocal()
+
+    try:
+
+        auth_header = authorization
+
+        if not auth_header:
+
+            return {
+                "success": False,
+                "message": "Token missing"
+            }
+
+        token = auth_header.replace(
+            "Bearer ",
+            ""
+        )
+
+        payload = get_current_user(
+            token
+        )
+
+        if not payload:
+
+            return {
+                "success": False,
+                "message": "Invalid token"
+            }
+
+        if payload.get(
+                "accessRole"
+        ) != "Admin":
+
+            return {
+                "success": False,
+                "message": "Admin access required"
+            }
+
+        member = db.query(
+            Member
+        ).filter(
+            Member.phoneNumber ==
+            phone_number
+        ).first()
+
+        if not member:
+
+            return {
+                "success": False,
+                "message": "Member not found"
+            }
+
+        db.delete(member)
+
+        db.commit()
+
+        log = ActivityLog(
+
+            action="Member Deleted",
+
+            performedBy=
+            payload.get(
+                "phoneNumber"
+            ),
+
+            timestamp=str(
+                datetime.utcnow()
+            )
+        )
+
+        db.add(log)
+
+        db.commit()
+
+        return {
+            "success": True
+        }
+
+    finally:
+
+        db.close()
+
 
 @app.get("/notices")
 def get_notices():

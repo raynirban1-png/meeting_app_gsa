@@ -169,10 +169,46 @@ class _MembersScreenState extends State<MembersScreen> {
     }
   }
 
-  void deleteMember(int index) {
-    setState(() {
-      MemberStore.members.removeAt(index);
-    });
+  Future<void>
+  deleteMember(
+      int index) async {
+
+    final member =
+    MemberStore
+        .members[index];
+
+    try {
+
+      final response =
+      await http.delete(
+
+        Uri.parse(
+          "${ApiConfig.baseUrl}/members/${member.phoneNumber}",
+        ),
+
+        headers:
+        await ApiService
+            .getHeaders(),
+      );
+
+      final data =
+      jsonDecode(
+          response.body);
+
+      if (data["success"] ==
+          true) {
+
+        setState(() {
+
+          MemberStore.members
+              .removeAt(index);
+        });
+      }
+
+    } catch (e) {
+
+      print(e);
+    }
   }
 
   void editMember(int index) {
