@@ -93,7 +93,7 @@ class Resolution(Base):
     status = Column(String)
 
 
-    class ActivityLog(Base):
+class ActivityLog(Base):
 
     __tablename__ = "activity_logs"
 
