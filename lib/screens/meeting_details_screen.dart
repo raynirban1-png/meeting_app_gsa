@@ -5,6 +5,10 @@ import '../models/resolution_model.dart';
 import '../models/member_store.dart';
 import '../models/resolution_store.dart';
 import '../models/current_user_store.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../lib/api_service.dart';
+import '../api_config.dart';
 
 class MeetingDetailsScreen extends StatefulWidget {
   final MeetingModel meeting;
@@ -329,11 +333,311 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
                         filteredResolutions[index]
                             .description,
                       ),
+                      trailing: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "For: "
+                            "${filteredResolutions[index].forVotes}",
+                          ),
+                          Text(
+                            "Against: "
+                            "${filteredResolutions[index].againstVotes}",
+                          ),
+                          Text(
+                            "Abstain: "
+                            "${filteredResolutions[index].abstainVotes}",
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+
+                        final resolution =
+                            filteredResolutions[index];
+
+                        final currentPhone =
+                            CurrentUserStore
+                                .currentUser
+                                ?.phoneNumber;
+
+                        if (currentPhone == null) {
+                          return;
+                        }
+
+                        if (resolution
+                            .votedMembers
+                            .contains(
+                                currentPhone)) {
+
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(
+
+                            const SnackBar(
+                              content: Text(
+                                "You already voted",
+                              ),
+                            ),
+                          );
+
+                          return;
+                        }
+
+                        showModalBottomSheet(
+
+                          context: context,
+
+                          builder: (context) {
+
+                            return Padding(
+
+                              padding:
+                                  const EdgeInsets
+                                      .all(20),
+
+                              child: Column(
+
+                                mainAxisSize:
+                                    MainAxisSize.min,
+
+                                children: [
+
+                                  ElevatedButton(
+
+                                    onPressed: () async {
+
+                                      try {
+
+                                        final response =
+                                            await http.post(
+
+                                          Uri.parse(
+                                            "${ApiConfig.baseUrl}/vote-resolution",
+                                          ),
+
+                                          headers:
+                                              await ApiService
+                                                  .getHeaders(),
+
+                                          body: jsonEncode({
+
+                                            "title":
+                                                resolution.title,
+
+                                            "voteType":
+                                                "for",
+                                          }),
+                                        );
+
+                                        final data =
+                                            jsonDecode(
+                                                response.body);
+
+                                        if (data["success"] ==
+                                            true) {
+
+                                          setState(() {
+
+                                            resolution
+                                                .forVotes++;
+
+                                            resolution
+                                                .votedMembers
+                                                .add(
+                                                  currentPhone,
+                                                );
+                                          });
+
+                                          Navigator.pop(
+                                              context);
+
+                                        } else {
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+
+                                            SnackBar(
+                                              content: Text(
+                                                data["message"],
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                      } catch (e) {
+
+                                        print(e);
+                                      }
+                                    },
+
+                                    child:
+                                        const Text(
+                                      "Vote For",
+                                    ),
+                                  ),
+
+                                  ElevatedButton(
+
+                                    onPressed: () async {
+
+                                      try {
+
+                                        final response =
+                                            await http.post(
+
+                                          Uri.parse(
+                                            "${ApiConfig.baseUrl}/vote-resolution",
+                                          ),
+
+                                          headers:
+                                              await ApiService
+                                                  .getHeaders(),
+
+                                          body: jsonEncode({
+
+                                            "title":
+                                                resolution.title,
+
+                                            "voteType":
+                                                "against",
+                                          }),
+                                        );
+
+                                        final data =
+                                            jsonDecode(
+                                                response.body);
+
+                                        if (data["success"] ==
+                                            true) {
+
+                                          setState(() {
+
+                                            resolution
+                                                .againstVotes++;
+
+                                            resolution
+                                                .votedMembers
+                                                .add(
+                                                  currentPhone,
+                                                );
+                                          });
+
+                                          Navigator.pop(
+                                              context);
+
+                                        } else {
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+
+                                            SnackBar(
+                                              content: Text(
+                                                data["message"],
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                      } catch (e) {
+
+                                        print(e);
+                                      }
+                                    },
+
+                                    child:
+                                        const Text(
+                                      "Vote Against",
+                                    ),
+                                  ),
+
+                                  ElevatedButton(
+
+                                    onPressed: () async {
+
+                                      try {
+
+                                        final response =
+                                            await http.post(
+
+                                          Uri.parse(
+                                            "${ApiConfig.baseUrl}/vote-resolution",
+                                          ),
+
+                                          headers:
+                                              await ApiService
+                                                  .getHeaders(),
+
+                                          body: jsonEncode({
+
+                                            "title":
+                                                resolution.title,
+
+                                            "voteType":
+                                                "abstain",
+                                          }),
+                                        );
+
+                                        final data =
+                                            jsonDecode(
+                                                response.body);
+
+                                        if (data["success"] ==
+                                            true) {
+
+                                          setState(() {
+
+                                            resolution
+                                                .abstainVotes++;
+
+                                            resolution
+                                                .votedMembers
+                                                .add(
+                                                  currentPhone,
+                                                );
+                                          });
+
+                                          Navigator.pop(
+                                              context);
+
+                                        } else {
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+
+                                            SnackBar(
+                                              content: Text(
+                                                data["message"],
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                      } catch (e) {
+
+                                        print(e);
+                                      }
+                                    },
+
+                                    child:
+                                        const Text(
+                                      "Abstain",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
                   );
                 },
               ),
             ],
+
           ),
         ),
       ),

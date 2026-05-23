@@ -551,6 +551,102 @@ def add_resolution(
         db.close()
 
 
+@app.post("/vote-resolution")
+def vote_resolution(
+    data: dict,
+    authorization: str = Header(
+        default=None,
+        alias="Authorization"
+    )
+):
+
+    db = SessionLocal()
+
+    try:
+
+        auth_header = authorization
+
+        if not auth_header:
+
+            return {
+                "success": False,
+                "message": "Token missing"
+            }
+
+        token = auth_header.replace(
+            "Bearer ",
+            ""
+        )
+
+        payload = get_current_user(
+            token
+        )
+
+        if not payload:
+
+            return {
+                "success": False,
+                "message": "Invalid token"
+            }
+
+        resolution = db.query(
+            Resolution
+        ).filter(
+            Resolution.title ==
+            data.get("title")
+        ).first()
+
+        if not resolution:
+
+            return {
+                "success": False,
+                "message":
+                    "Resolution not found"
+            }
+
+        voted_members = json.loads(
+            resolution.votedMembers
+        )
+
+        voter = payload.get("phoneNumber")
+
+        if voter in voted_members:
+
+            return {
+                "success": False,
+                "message":
+                    "Already voted"
+            }
+
+        vote_type = data.get("voteType")
+
+        if vote_type == "for":
+
+            resolution.forVotes += 1
+
+        elif vote_type == "against":
+
+            resolution.againstVotes += 1
+
+        else:
+
+            resolution.abstainVotes += 1
+
+        voted_members.append(voter)
+
+        resolution.votedMembers = json.dumps(voted_members)
+
+        db.commit()
+
+        return {
+            "success": True
+        }
+
+    finally:
+
+        db.close()
+
+
 @app.post("/login")
 def login(data: dict):
     db = SessionLocal()
