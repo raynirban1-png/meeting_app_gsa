@@ -100,6 +100,12 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
     resolutionDescriptionController.clear();
 
     Navigator.pop(context);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Resolution added successfully"),
+      ),
+    );
   }
   @override
   void dispose() {
@@ -220,6 +226,21 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
                   );
                 },
               ),
+              const SizedBox(height: 10),
+              if (CurrentUserStore.isAdmin)
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Attendance saved successfully"),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.save),
+                    label: const Text("Save Attendance"),
+                  ),
+                ),
               const SizedBox(height: 30),
 
               Row(
@@ -451,6 +472,17 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
                                           Navigator.pop(
                                               context);
 
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+
+                                            const SnackBar(
+                                              content: Text(
+                                                "Vote submitted successfully",
+                                              ),
+                                            ),
+                                          );
+
                                         } else {
 
                                           ScaffoldMessenger.of(
@@ -526,6 +558,17 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
                                           Navigator.pop(
                                               context);
 
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+
+                                            const SnackBar(
+                                              content: Text(
+                                                "Vote submitted successfully",
+                                              ),
+                                            ),
+                                          );
+
                                         } else {
 
                                           ScaffoldMessenger.of(
@@ -600,6 +643,17 @@ class _MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
 
                                           Navigator.pop(
                                               context);
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+
+                                            const SnackBar(
+                                              content: Text(
+                                                "Vote submitted successfully",
+                                              ),
+                                            ),
+                                          );
 
                                         } else {
 

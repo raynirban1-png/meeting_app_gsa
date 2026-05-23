@@ -103,6 +103,11 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
                   MeetingStore.meetings.removeAt(index);
                 });
                 Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Meeting deleted successfully"),
+                  ),
+                );
               },
               child: const Text("Delete"),
             ),

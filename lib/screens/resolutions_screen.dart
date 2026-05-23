@@ -98,6 +98,11 @@ class _ResolutionsScreenState
                 });
 
                 Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Resolution deleted successfully"),
+                  ),
+                );
               },
               child: const Text("Delete"),
             ),

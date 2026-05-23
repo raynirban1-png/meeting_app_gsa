@@ -203,11 +203,28 @@ class _MembersScreenState extends State<MembersScreen> {
           MemberStore.members
               .removeAt(index);
         });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Member deleted successfully"),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(data["message"] ?? "Deletion failed"),
+          ),
+        );
       }
 
     } catch (e) {
 
       print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Network error: ${e.toString()}"),
+        ),
+      );
     }
   }
 
