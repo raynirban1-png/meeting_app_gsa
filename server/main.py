@@ -482,19 +482,6 @@ def get_activity_logs():
 
         db.close()
 
-@app.get("/create-tables")
-def create_tables():
-
-    Base.metadata.create_all(
-        bind=engine
-    )
-
-    return {
-        "message":
-            "Tables created"
-    }
-
-
 @app.post("/resolutions")
 def add_resolution(
         data: dict,
